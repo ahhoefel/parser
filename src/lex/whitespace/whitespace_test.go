@@ -1,7 +1,7 @@
 package whitespace
 
 import "testing"
-import "trie"
+import "lex/trie"
 import "lex"
 
 func TestWhitespace(t *testing.T) {
