@@ -48,15 +48,22 @@ func (b *Buffer) feed(start int) (err error) {
         if b.Lex.Match() {
             b.lastMatchSize = i + 1
             b.lastMatchTag = b.Lex.Tag()
+            fmt.Printf("Match at %d\n", b.lastMatchSize)
         }
         if b.Lex.Error() {
             if b.lastMatchSize == 0 {
                 return fmt.Errorf("failed to parse starting at position %d", b.runesFed)
             }
-            b.Taker.Take(Match{b.runesFed, string(b.buf[:b.lastMatchSize]), b.lastMatchTag})
+            err := b.Taker.Take(Match{b.runesFed, string(b.buf[:b.lastMatchSize]), b.lastMatchTag})
+            if err != nil {
+                return err
+            }
             b.buf = b.buf[b.lastMatchSize:]
+            b.runesFed += b.lastMatchSize
             b.lastMatchSize = 0
             b.lastMatchTag = nil
+            i = -1 // zero on next iteration
+            b.Lex.Reset()
         }
     }
     return nil

@@ -43,3 +43,30 @@ func TestBuffer(t *testing.T) {
         t.Error("expected err != nil, got nil")
     }
 }
+
+
+func TestBufferParens(t *testing.T) {
+    taker := SimpleTaker([]Match{})
+    b := Buffer{
+        Taker: &taker,
+        Lex: trie.New("tag", "{", "}"),
+    }
+    expected := SimpleTaker{
+        Match{0, "{", tag.New("tag")},
+        Match{1, "}", tag.New("tag")},
+        Match{2, "{", tag.New("tag")},
+        Match{3, "}", tag.New("tag")},
+    }
+    n, err := b.Read([]byte("{}{}")) 
+    if n != 4 {
+        t.Errorf("expected n == 4, got %d", n)
+    }
+    if err != nil {
+        t.Errorf("expected err == nil, got %v", err)
+    }
+    for i, m := range taker {
+        if m.Index != expected[i].Index || m.Str != expected[i].Str || m.Tag.Tag() != expected[i].Tag.Tag() {
+            t.Errorf("taker[%d] != %v, got %v", i, expected[i], m)   
+        }
+    }
+}

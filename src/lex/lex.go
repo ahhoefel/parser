@@ -17,11 +17,12 @@ type Match struct{
 }
 
 type Taker interface {
-    Take(Match)
+    Take(Match) error
 }
 
 type SimpleTaker []Match
 
-func (t *SimpleTaker) Take(m Match) {
+func (t *SimpleTaker) Take(m Match) error {
     *t = append(*t, m)
+    return nil
 }
