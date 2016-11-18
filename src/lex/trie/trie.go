@@ -1,11 +1,13 @@
 package trie
 
+import "lex/tag"
+
 type Trie struct {
     chars map[rune]*Trie
     terminal bool
 }
 
-func New(s []string) *Trie{
+func NewTrie(s []string) *Trie{
     t := &Trie{}
     for _, w := range s {
         t.Add(w)
@@ -55,15 +57,13 @@ func (t *Trie) Match() bool {
 }
 
 type TrieLexer struct {
+    tag string
     head, cur *Trie
 }
 
-func NewLexer(strs ...string) *TrieLexer {
-    t := &Trie{}
-    for _, s := range strs {
-        t.Add(s)
-    }
-    return &TrieLexer{t,t}
+func New(tag string, strs ...string) *TrieLexer {
+    t := NewTrie(strs)
+    return &TrieLexer{tag, t, t}
 }
 
 func (l *TrieLexer) Next(r rune) {
@@ -72,6 +72,10 @@ func (l *TrieLexer) Next(r rune) {
 
 func (l *TrieLexer) Match() bool {
     return l.cur != nil && l.cur.terminal
+}
+
+func (l *TrieLexer) Tag() tag.Tag {
+    return tag.New(l.tag)
 }
 
 func (l *TrieLexer) Error() bool {

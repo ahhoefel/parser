@@ -1,0 +1,45 @@
+package lex
+
+import (
+    "testing"
+    "lex/trie"
+    "lex/tag"
+)
+
+func TestBuffer(t *testing.T) {
+    taker := SimpleTaker([]Match{})
+    b := Buffer{
+        Taker: &taker,
+        Lex: trie.New("tag", "abc", "abcdef","abcdefgh", "ggg"),
+    }
+    expected := SimpleTaker{
+        Match{0, "abcdef", tag.New("tag")},
+        Match{1, "ggg", tag.New("tag")},
+    }
+    n, err := b.Read([]byte("abcde")) 
+    if n != 5 {
+        t.Errorf("expected n == 5, got %d", n)
+    }
+    if err != nil {
+        t.Errorf("expected err == nil, got %v", err)
+    }
+    n, err = b.Read([]byte("fggg")) 
+      if n != 4 {
+        t.Errorf("expected n == 4, got %d", n)
+    }
+    if err != nil {
+        t.Errorf("expected err == nil, got %v", err)
+    }
+    for i, m := range taker {
+        if m.Index != expected[i].Index || m.Str != expected[i].Str || m.Tag.Tag() != expected[i].Tag.Tag() {
+            t.Errorf("taker[%d] != %v, got %v", i, expected[i], m)   
+        }
+    }
+    n, err = b.Read([]byte("xyz")) 
+      if n != 3 {
+        t.Errorf("expected n == 3, got %d", n)
+    }
+    if err == nil {
+        t.Error("expected err != nil, got nil")
+    }
+}
