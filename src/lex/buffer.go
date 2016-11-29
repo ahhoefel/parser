@@ -43,28 +43,18 @@ func (b *Buffer) Read(p []byte) (int, error) {
 }
 
 func (b *Buffer) Close() error {
-    for b.lastMatchSize > 0 {
-        err := b.Taker.Take(Match{b.runesFed, string(b.buf[:b.lastMatchSize]), b.lastMatchTag})
-        if err != nil {
+    for len(b.buf) > 0 {
+        if err := b.sendMatch(); err != nil {
             return err
         }
-        b.buf = b.buf[b.lastMatchSize:]
-        b.runesFed += b.lastMatchSize
-        b.lastMatchSize = 0
-        b.lastMatchTag = nil
-        b.Lex.Reset()
-        err = b.feed(0)
-        if err != nil {
+        if err := b.feed(0); err != nil {
             return err
         }
-    }
-    if len(b.buf) > 0 {
-        return fmt.Errorf("failed to parse starting at position %d", b.runesFed)
     }
     return nil
 }
 
-func (b *Buffer) feed(start int) (err error) {
+func (b *Buffer) feed(start int) error {
     for i := start; i < len(b.buf); i++ {
         b.Lex.Next(b.buf[i])
         if b.Lex.Match() {
@@ -72,20 +62,24 @@ func (b *Buffer) feed(start int) (err error) {
             b.lastMatchTag = b.Lex.Tag()
         }
         if b.Lex.Error() {
-            if b.lastMatchSize == 0 {
-                return fmt.Errorf("failed to parse starting at position %d", b.runesFed)
-            }
-            err := b.Taker.Take(Match{b.runesFed, string(b.buf[:b.lastMatchSize]), b.lastMatchTag})
-            if err != nil {
+            if err := b.sendMatch(); err != nil {
                 return err
             }
-            b.buf = b.buf[b.lastMatchSize:]
-            b.runesFed += b.lastMatchSize
-            b.lastMatchSize = 0
-            b.lastMatchTag = nil
             i = -1 // zero on next iteration
-            b.Lex.Reset()
         }
     }
     return nil
+}
+
+func (b *Buffer) sendMatch() error {
+    if b.lastMatchSize == 0 {
+        return fmt.Errorf("failed to parse starting at position %d", b.runesFed)
+    }
+    match := Match{b.runesFed, string(b.buf[:b.lastMatchSize]), b.lastMatchTag}
+    b.buf = b.buf[b.lastMatchSize:]
+    b.runesFed += b.lastMatchSize
+    b.lastMatchSize = 0
+    b.lastMatchTag = nil
+    b.Lex.Reset()
+    return b.Taker.Take(match)
 }

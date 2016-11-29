@@ -14,7 +14,7 @@ func TestBuffer(t *testing.T) {
     }
     expected := SimpleTaker{
         Match{0, "abcdef", tag.New("tag")},
-        Match{1, "ggg", tag.New("tag")},
+        Match{6, "ggg", tag.New("tag")},
     }
     n, err := b.Read([]byte("abcde")) 
     if n != 5 {
@@ -24,11 +24,17 @@ func TestBuffer(t *testing.T) {
         t.Errorf("expected err == nil, got %v", err)
     }
     n, err = b.Read([]byte("fggg")) 
-      if n != 4 {
+    if err == nil {
+        err = b.Close()
+    }
+    if n != 4 {
         t.Errorf("expected n == 4, got %d", n)
     }
     if err != nil {
         t.Errorf("expected err == nil, got %v", err)
+    }
+    if len(taker) != len(expected) {
+        t.Errorf("expected len(taker) == %d, got %d", len(expected), len(taker))
     }
     for i, m := range taker {
         if m.Index != expected[i].Index || m.Str != expected[i].Str || !tag.Equal(m.Tag, expected[i].Tag) {
@@ -59,7 +65,7 @@ func TestBufferParens(t *testing.T) {
     }
     n, err := b.Read([]byte("{}{}")) 
     if err == nil {
-        err b.Close()
+        err = b.Close()
     }
     if err != nil {
         t.Errorf("expected err == nil, got %v", err)
