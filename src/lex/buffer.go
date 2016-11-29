@@ -42,13 +42,34 @@ func (b *Buffer) Read(p []byte) (int, error) {
     return n, nil
 }
 
+func (b *Buffer) Close() error {
+    for b.lastMatchSize > 0 {
+        err := b.Taker.Take(Match{b.runesFed, string(b.buf[:b.lastMatchSize]), b.lastMatchTag})
+        if err != nil {
+            return err
+        }
+        b.buf = b.buf[b.lastMatchSize:]
+        b.runesFed += b.lastMatchSize
+        b.lastMatchSize = 0
+        b.lastMatchTag = nil
+        b.Lex.Reset()
+        err = b.feed(0)
+        if err != nil {
+            return err
+        }
+    }
+    if len(b.buf) > 0 {
+        return fmt.Errorf("failed to parse starting at position %d", b.runesFed)
+    }
+    return nil
+}
+
 func (b *Buffer) feed(start int) (err error) {
     for i := start; i < len(b.buf); i++ {
         b.Lex.Next(b.buf[i])
         if b.Lex.Match() {
             b.lastMatchSize = i + 1
             b.lastMatchTag = b.Lex.Tag()
-            fmt.Printf("Match at %d\n", b.lastMatchSize)
         }
         if b.Lex.Error() {
             if b.lastMatchSize == 0 {

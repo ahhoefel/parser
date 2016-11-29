@@ -3,9 +3,10 @@ package combined
 import "testing"
 import "lex/trie"
 import "lex/tag"
+import "lex"
 
 func TestLex(t *testing.T) {
-    l := New([]Lex{
+    l := New([]lex.Lex{
         trie.New("tag1", "foo", "foots"),
         trie.New("tag2", "foo", "fool"),
     })

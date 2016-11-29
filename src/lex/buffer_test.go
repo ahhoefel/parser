@@ -31,7 +31,7 @@ func TestBuffer(t *testing.T) {
         t.Errorf("expected err == nil, got %v", err)
     }
     for i, m := range taker {
-        if m.Index != expected[i].Index || m.Str != expected[i].Str || m.Tag.Tag() != expected[i].Tag.Tag() {
+        if m.Index != expected[i].Index || m.Str != expected[i].Str || !tag.Equal(m.Tag, expected[i].Tag) {
             t.Errorf("taker[%d] != %v, got %v", i, expected[i], m)   
         }
     }
@@ -58,14 +58,20 @@ func TestBufferParens(t *testing.T) {
         Match{3, "}", tag.New("tag")},
     }
     n, err := b.Read([]byte("{}{}")) 
-    if n != 4 {
-        t.Errorf("expected n == 4, got %d", n)
+    if err == nil {
+        err b.Close()
     }
     if err != nil {
         t.Errorf("expected err == nil, got %v", err)
     }
+    if n != 4 {
+        t.Errorf("expected n == 4, got %d", n)
+    }
+    if len(taker) != 4 {
+        t.Errorf("expected 4 matches, got %d", len(taker))
+    }
     for i, m := range taker {
-        if m.Index != expected[i].Index || m.Str != expected[i].Str || m.Tag.Tag() != expected[i].Tag.Tag() {
+        if m.Index != expected[i].Index || m.Str != expected[i].Str || !tag.Equal(m.Tag, expected[i].Tag) {
             t.Errorf("taker[%d] != %v, got %v", i, expected[i], m)   
         }
     }
