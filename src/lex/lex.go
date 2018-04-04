@@ -1,5 +1,7 @@
 package lex
 
+// FOOO
+
 import "lex/tag"
 
 type Lex interface {
