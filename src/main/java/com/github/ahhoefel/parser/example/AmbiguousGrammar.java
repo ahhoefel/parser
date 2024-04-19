@@ -6,7 +6,6 @@ import com.github.ahhoefel.parser.Symbol;
 import com.github.ahhoefel.parser.lang.LanguageComponent;
 import com.github.ahhoefel.parser.lang.LexicalMapping;
 import com.github.ahhoefel.parser.lang.RangeEmitter;
-import com.github.ahhoefel.parser.lang.Rule;
 import com.github.ahhoefel.parser.lang.RuleEmitter;
 import com.github.ahhoefel.parser.lang.SymbolProvider;
 
