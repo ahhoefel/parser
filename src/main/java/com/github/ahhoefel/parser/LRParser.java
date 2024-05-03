@@ -2,13 +2,13 @@ package com.github.ahhoefel.parser;
 
 import java.util.*;
 
-import com.github.ahhoefel.parser.lang.RangeTokenizer;
 import com.github.ahhoefel.parser.io.ParseError;
 import com.github.ahhoefel.parser.io.Target;
 import com.github.ahhoefel.parser.lang.GrammarBuilder;
 import com.github.ahhoefel.parser.lang.LanguageComponent;
 import com.github.ahhoefel.parser.lang.LexicalMapping;
 import com.github.ahhoefel.parser.lang.Rule;
+import com.github.ahhoefel.parser.lang.Tokenizer;
 
 /**
  * A canonical LR parser.
@@ -57,7 +57,7 @@ public class LRParser {
 
   private Object parse(Optional<Target> target, String s) {
     ErrorLog log = new ErrorLog();
-    LocateableList<Token> tokens = RangeTokenizer.tokenize(grammar.getTokenizer(), target, s, log);
+    LocateableList<Token> tokens = Tokenizer.tokenize(grammar.getTokenizer(), target, s, log);
     if (!log.isEmpty()) {
       throw new ParseException(log);
     }
