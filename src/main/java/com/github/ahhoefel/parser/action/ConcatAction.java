@@ -25,6 +25,7 @@ public class ConcatAction implements Function<Locateable[], Locateable> {
   private ConcatAction() {
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public Locateable apply(Locateable[] objects) {
     if (objects.length == 0) {
@@ -47,7 +48,8 @@ public class ConcatAction implements Function<Locateable[], Locateable> {
           type = token.getSymbol();
         }
       } else {
-        throw new RuntimeException("Unsupported type. Only Tokens are supported by ConcatAction.");
+        throw new RuntimeException(
+            "Unsupported type (" + o.getClass() + "). Only Tokens are supported by ConcatAction.");
       }
     }
     return new Token(type, buf.toString(), location);

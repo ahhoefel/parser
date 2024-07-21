@@ -1,10 +1,13 @@
 package com.github.ahhoefel.parser.example;
 
+import java.util.Iterator;
 import java.util.List;
 
-import com.github.ahhoefel.parser.LRParser;
+import com.github.ahhoefel.parser.LayeredParser;
 import com.github.ahhoefel.parser.ShiftReduceResolver;
 import com.github.ahhoefel.parser.Symbol;
+import com.github.ahhoefel.parser.Token;
+import com.github.ahhoefel.parser.action.ParseTree;
 import com.github.ahhoefel.parser.lang.LanguageComponent;
 import com.github.ahhoefel.parser.lang.LexicalMapping;
 import com.github.ahhoefel.parser.lang.RangeEmitter;
@@ -12,10 +15,10 @@ import com.github.ahhoefel.parser.lang.Rule;
 import com.github.ahhoefel.parser.lang.RuleEmitter;
 import com.github.ahhoefel.parser.lang.SymbolProvider;
 
-public class ExpressionParser extends LRParser {
+public class ExpressionParser extends LayeredParser.Layer<Iterator<Token<String>>, ParseTree> {
 
     public ExpressionParser() {
-        super(new CharacterMapping(), "expression",
+        super(ParseTree.class, new TerminalLayeredParser(new CharacterMapping()), "expression",
                 new OperatorComponent(), new ValueComponent());
     }
 

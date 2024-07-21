@@ -2,12 +2,10 @@ package com.github.ahhoefel.parser;
 
 import java.util.*;
 
-import com.github.ahhoefel.parser.lang.Tokenizer;
 import com.github.ahhoefel.parser.lang.Rule;
 
 public class Grammar {
 
-  private Tokenizer tokenizer;
   private SymbolTable.TerminalTable terminals;
   private SymbolTable.NonTerminalTable nonTerminals;
   private List<Rule> rules;
@@ -15,12 +13,11 @@ public class Grammar {
   private Rule augmentedStart;
   private ShiftReduceResolver resolver;
 
-  public Grammar(Tokenizer tokenizer,
+  public Grammar(SymbolTable.TerminalTable terminals,
       SymbolTable.NonTerminalTable nonTerminals,
       List<Rule> rules,
       ShiftReduceResolver resolver) {
-    this.tokenizer = tokenizer;
-    this.terminals = tokenizer.getTerminals();
+    this.terminals = terminals;
     this.nonTerminals = nonTerminals;
     this.resolver = resolver;
     this.augmentedStart = new Rule(nonTerminals.getAugmentedStart(), List.of(nonTerminals.getStart()))
@@ -42,10 +39,6 @@ public class Grammar {
     for (Rule rule : rules)
       out.append(rule).append("\n");
     return out.toString();
-  }
-
-  public Tokenizer getTokenizer() {
-    return tokenizer;
   }
 
   public SymbolTable.TerminalTable getTerminals() {

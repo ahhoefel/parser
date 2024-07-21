@@ -2,13 +2,12 @@ package com.github.ahhoefel.parser;
 
 import java.util.*;
 
+import com.github.ahhoefel.parser.SymbolTable.TerminalTable;
 import com.github.ahhoefel.parser.io.ParseError;
 import com.github.ahhoefel.parser.io.Target;
 import com.github.ahhoefel.parser.lang.GrammarBuilder;
 import com.github.ahhoefel.parser.lang.LanguageComponent;
-import com.github.ahhoefel.parser.lang.LexicalMapping;
 import com.github.ahhoefel.parser.lang.Rule;
-import com.github.ahhoefel.parser.lang.Tokenizer;
 
 /**
  * A canonical LR parser.
@@ -42,32 +41,40 @@ public class LRParser {
   private LRTable table;
   private Grammar grammar;
 
-  public LRParser(LexicalMapping lex, String startSymbol, LanguageComponent... components) {
-    this.grammar = GrammarBuilder.build(lex, startSymbol, components);
+  public LRParser(TerminalTable terminals, String startSymbol, LanguageComponent... components) {
+    this.grammar = GrammarBuilder.build(terminals, startSymbol, components);
     this.table = getCanonicalLRTable(grammar);
   }
 
-  public Object parse(String s) {
-    return parse(Optional.empty(), s);
+  public SymbolTable.TerminalTable getTerminals() {
+    return grammar.getTerminals();
   }
 
-  public Object parse(Target t, String s) {
-    return parse(Optional.of(t), s);
+  public SymbolTable.TerminalTable getNonTerminals() {
+    return grammar.getNonTerminals();
   }
 
-  private Object parse(Optional<Target> target, String s) {
+  public <T> T parse(@SuppressWarnings("rawtypes") Iterator<Token> tokens, Class<T> clazz) {
+    return parse(Optional.empty(), tokens, clazz);
+  }
+
+  public <T> T parse(Target target, @SuppressWarnings("rawtypes") Iterator<Token> tokens, Class<T> clazz) {
+    return parse(Optional.of(target), tokens, clazz);
+  }
+
+  public <T> T parse(Optional<Target> target, @SuppressWarnings("rawtypes") Iterator<Token> tokens, Class<T> clazz) {
     ErrorLog log = new ErrorLog();
-    LocateableList<Token> tokens = Tokenizer.tokenize(grammar.getTokenizer(), target, s, log);
+
     if (!log.isEmpty()) {
       throw new ParseException(log);
     }
-    tokens.add(new Token(grammar.getTerminals().getEof(), "eof", null));
-    Object o = parseTokens(table, tokens.getList().iterator(), grammar.getAugmentedStartRule().getSource(),
+    Object o = parseTokens(table, tokens, grammar.getAugmentedStartRule().getSource(),
         Optional.empty(), log);
     if (!log.isEmpty()) {
+      System.out.println(table);
       throw new ParseException(log);
     }
-    return o;
+    return clazz.cast(o);
   }
 
   private static LRTable getCanonicalLRTable(Grammar g) {
@@ -153,12 +160,13 @@ public class LRParser {
     }
   }
 
-  private static <C extends Locateable> Object parseTokens(LRTable table, Iterator<Token> iter, Symbol start,
+  @SuppressWarnings("rawtypes")
+  private static <C extends Locateable> Object parseTokens(LRTable table, Iterator<Token> tokens, Symbol start,
       Optional<C> context,
       ErrorLog log) {
     Stack<SymbolState> stack = new Stack<>();
     Stack<Locateable> result = new Stack<>();
-    Token nextToken = iter.next();
+    Token nextToken = tokens.next();
     Symbol nextSymbol = nextToken.getSymbol();
     SymbolState symbolState = new SymbolState(start, 0);
     while (true) {
@@ -166,8 +174,8 @@ public class LRParser {
       if (state.shift.containsKey(nextSymbol)) {
         stack.push(new SymbolState(nextSymbol, state.shift.get(nextSymbol)));
         result.push(nextToken);
-        if (iter.hasNext()) {
-          nextToken = iter.next();
+        if (tokens.hasNext()) {
+          nextToken = tokens.next();
           nextSymbol = nextToken.getSymbol();
         } else {
           result.pop(); // Remove eof

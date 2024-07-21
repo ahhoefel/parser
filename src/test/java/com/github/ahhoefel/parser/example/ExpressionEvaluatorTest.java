@@ -3,8 +3,6 @@ package com.github.ahhoefel.parser.example;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.ahhoefel.parser.example.ExpressionEvaluator.LocateableInteger;
-
 public class ExpressionEvaluatorTest {
 
         private ExpressionEvaluator parser;

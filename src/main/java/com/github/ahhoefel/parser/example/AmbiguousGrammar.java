@@ -1,39 +1,43 @@
 package com.github.ahhoefel.parser.example;
 
-import com.github.ahhoefel.parser.LRParser;
+import java.util.Iterator;
+import java.util.Optional;
+
+import com.github.ahhoefel.parser.LayeredParser;
 import com.github.ahhoefel.parser.ShiftReduceResolver;
 import com.github.ahhoefel.parser.Symbol;
+import com.github.ahhoefel.parser.Token;
 import com.github.ahhoefel.parser.lang.LanguageComponent;
 import com.github.ahhoefel.parser.lang.LexicalMapping;
 import com.github.ahhoefel.parser.lang.RangeEmitter;
 import com.github.ahhoefel.parser.lang.RuleEmitter;
 import com.github.ahhoefel.parser.lang.SymbolProvider;
 
-public class AmbiguousGrammar extends LRParser {
+public class AmbiguousGrammar extends LayeredParser.Layer<Iterator<Token<String>>, String> {
 
-    public AmbiguousGrammar() {
-        super(new LetterAMapping(), "S",
-                new ReduceAmbiguousComponent());
+    public AmbiguousGrammar(LanguageComponent component) {
+        super(String.class, new TerminalLayeredParser(new LetterAMapping()), "S",
+                component);
     }
 
     public static void main(String[] args) {
         try {
-            new LRParser(new LetterAMapping(), "S",
-                    new ReduceAmbiguousComponent());
+            new AmbiguousGrammar(new ReduceAmbiguousComponent());
         } catch (Exception e) {
             System.out.println(e);
         }
 
         try {
-            new LRParser(new LetterAMapping(), "S",
-                    new ShiftReduceAmbiguousComponent());
+            new AmbiguousGrammar(new ShiftReduceAmbiguousComponent());
+
         } catch (Exception e) {
             System.out.println(e);
         }
 
-        LRParser parser = new LRParser(new LetterAAndPlusMapping(), "S",
+        LayeredParser<String> parser = new Layer<Iterator<Token<String>>, String>(String.class,
+                new TerminalLayeredParser(new LetterAAndPlusMapping()), "S",
                 new ShiftReduceFixableComponent());
-        System.out.println(parser.parse("a+a+a"));
+        System.out.println(parser.parse(Optional.empty(), "a+a+a"));
     }
 
     public static class ReduceAmbiguousComponent implements LanguageComponent {

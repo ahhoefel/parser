@@ -11,20 +11,21 @@ import com.github.ahhoefel.parser.Grammar;
 import com.github.ahhoefel.parser.ShiftReduceResolver;
 import com.github.ahhoefel.parser.Symbol;
 import com.github.ahhoefel.parser.SymbolTable;
+import com.github.ahhoefel.parser.SymbolTable.TerminalTable;
 
 public class GrammarBuilder {
     private SymbolTable.NonTerminalTable nonTerminals;
     private List<Rule> rules;
     private ShiftReduceResolver resolver;
-    private RangeTokenizer tokenizer;
+    private TerminalTable terminals;
 
     private Map<String, Symbol> notProvided;
 
-    private GrammarBuilder() {
+    private GrammarBuilder(TerminalTable terminals) {
         resolver = new ShiftReduceResolver();
         rules = new ArrayList<>();
+        this.terminals = terminals;
         nonTerminals = new SymbolTable.NonTerminalTable();
-        tokenizer = new RangeTokenizer();
         notProvided = new HashMap<>();
     }
 
@@ -54,7 +55,7 @@ public class GrammarBuilder {
                 if (optSymbol.isPresent()) {
                     return optSymbol.get();
                 }
-                optSymbol = tokenizer.getTerminals().getSymbolByLabel(label);
+                optSymbol = terminals.getSymbolByLabel(label);
                 if (optSymbol.isPresent()) {
                     return optSymbol.get();
                 }
@@ -82,9 +83,8 @@ public class GrammarBuilder {
         };
     }
 
-    public static Grammar build(LexicalMapping lex, String start, LanguageComponent... components) {
-        GrammarBuilder grammar = new GrammarBuilder();
-        lex.provideRanges(grammar.tokenizer);
+    public static Grammar build(TerminalTable terminals, String start, LanguageComponent... components) {
+        GrammarBuilder grammar = new GrammarBuilder(terminals);
         for (LanguageComponent component : components) {
             component.provideRules(grammar.getSymbolProvider(), grammar.getResolver(), grammar.getRuleEmitter());
         }
@@ -97,7 +97,7 @@ public class GrammarBuilder {
             throw new RuntimeException(String.format("Start symbol %s not provided.", start));
         }
         grammar.getRuleEmitter().emit(grammar.nonTerminals.getStart(), startSymbol).setAction(e -> e[0]);
-        Grammar g = new Grammar(grammar.tokenizer, grammar.nonTerminals, grammar.rules,
+        Grammar g = new Grammar(grammar.terminals, grammar.nonTerminals, grammar.rules,
                 grammar.resolver);
         return g;
     }

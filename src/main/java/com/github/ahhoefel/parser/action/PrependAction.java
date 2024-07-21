@@ -1,8 +1,9 @@
 package com.github.ahhoefel.parser.action;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Function;
+
+import com.github.ahhoefel.parser.Locateable;
+import com.github.ahhoefel.parser.LocateableList;
 
 /**
  * Prepends the first result to the list returned by the second.
@@ -18,13 +19,12 @@ import java.util.function.Function;
  * L -> a
  * </pre>
  * 
- * The resulting list is implemented with LinkedList, so element access by index
- * should be avoided.
- * 
+ * This class should be reimplemented using a LinkedLocatableList, as currently
+ * prepending is O(n).
  * Use the provided static PrependAction.SINGLETON, rather than instantiating
  * this class.
  */
-public class PrependAction implements Function<Object[], Object> {
+public class PrependAction implements Function<Locateable[], Locateable> {
 
   public static final PrependAction SINGLETON = new PrependAction();
 
@@ -33,12 +33,12 @@ public class PrependAction implements Function<Object[], Object> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object apply(Object[] objects) {
-    List<Object> list;
+  public Locateable apply(Locateable[] objects) {
+    LocateableList<Locateable> list;
     if (objects.length == 1) {
-      list = new LinkedList<Object>();
+      list = new LocateableList<>();
     } else {
-      list = (List<Object>) objects[1];
+      list = (LocateableList<Locateable>) objects[1];
     }
     if (objects[0] != null) {
       list.addFirst(objects[0]);

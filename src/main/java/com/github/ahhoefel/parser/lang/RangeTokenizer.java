@@ -7,7 +7,7 @@ import com.github.ahhoefel.parser.Token;
 import com.github.ahhoefel.parser.SymbolTable.TerminalTable;
 import com.github.ahhoefel.parser.io.CodeLocation;
 
-public class RangeTokenizer implements RangeEmitter, Tokenizer {
+public class RangeTokenizer implements RangeEmitter, Tokenizer<Token<String>> {
 
     private Symbol[] charTerminalMap;
     private TerminalTable terminals;
@@ -17,7 +17,7 @@ public class RangeTokenizer implements RangeEmitter, Tokenizer {
     public RangeTokenizer() {
         this.charTerminalMap = new Symbol[256];
         this.terminals = new TerminalTable();
-        eof = this.terminals.newSymbol("eof");
+        this.eof = this.terminals.getEof();
         unknown = this.terminals.newSymbol("unknown");
     }
 
@@ -46,7 +46,7 @@ public class RangeTokenizer implements RangeEmitter, Tokenizer {
         return terminals;
     }
 
-    public Token of(int c, CodeLocation location) {
+    public Token<String> of(int c, CodeLocation location) {
         Symbol symbol;
         String value;
         if (c < 0) {
@@ -63,6 +63,11 @@ public class RangeTokenizer implements RangeEmitter, Tokenizer {
             }
             value = Character.toString((char) c);
         }
-        return new Token(symbol, value, location);
+        return new Token<String>(symbol, value, location);
+    }
+
+    @Override
+    public Token<String> eof() {
+        return new Token<String>(eof, "eof", null);
     }
 }

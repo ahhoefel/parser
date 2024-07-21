@@ -1,14 +1,13 @@
 package com.github.ahhoefel.parser.example;
 
+import java.util.Iterator;
 import java.util.List;
 
-import com.github.ahhoefel.parser.LRParser;
-import com.github.ahhoefel.parser.Locateable;
+import com.github.ahhoefel.parser.LayeredParser;
 import com.github.ahhoefel.parser.ShiftReduceResolver;
 import com.github.ahhoefel.parser.Symbol;
 import com.github.ahhoefel.parser.Token;
 import com.github.ahhoefel.parser.action.ConcatAction;
-import com.github.ahhoefel.parser.io.CodeLocation;
 import com.github.ahhoefel.parser.lang.LanguageComponent;
 import com.github.ahhoefel.parser.lang.LexicalMapping;
 import com.github.ahhoefel.parser.lang.RangeEmitter;
@@ -16,10 +15,10 @@ import com.github.ahhoefel.parser.lang.Rule;
 import com.github.ahhoefel.parser.lang.RuleEmitter;
 import com.github.ahhoefel.parser.lang.SymbolProvider;
 
-public class ExpressionEvaluator extends LRParser {
+public class ExpressionEvaluator extends LayeredParser.Layer<Iterator<Token<String>>, LocateableInteger> {
 
     public ExpressionEvaluator() {
-        super(new CharacterMapping(), "expression",
+        super(LocateableInteger.class, new TerminalLayeredParser(new CharacterMapping()), "expression",
                 new OperatorComponent(), new ValueComponent());
     }
 
@@ -39,48 +38,8 @@ public class ExpressionEvaluator extends LRParser {
         }
     }
 
-    public static class LocateableInteger implements Locateable {
-
-        private CodeLocation location;
-        private int value;
-
-        public LocateableInteger(int value, CodeLocation location) {
-            this.value = value;
-            this.location = location;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        @Override
-        public CodeLocation getLocation() {
-            return location;
-        }
-
-        @Override
-        public void setLocation(CodeLocation location) {
-            this.location = location;
-        }
-
-        public LocateableInteger plus(LocateableInteger other) {
-            return new LocateableInteger(value + other.value, new CodeLocation(this.location, other.location));
-        }
-
-        public LocateableInteger times(LocateableInteger other) {
-            return new LocateableInteger(value * other.value, new CodeLocation(this.location, other.location));
-        }
-
-        public LocateableInteger minus(LocateableInteger other) {
-            return new LocateableInteger(value - other.value, new CodeLocation(this.location, other.location));
-        }
-
-        public String toString() {
-            return Integer.toString(value);
-        }
-    }
-
     public static class OperatorComponent implements LanguageComponent {
+        @SuppressWarnings("unchecked")
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol expression = provider.createAndExport("expression");
@@ -100,7 +59,7 @@ public class ExpressionEvaluator extends LRParser {
                     .setAction(e -> e[1]);
             rules.emit(expression, number)
                     .setAction(e -> new LocateableInteger(
-                            Integer.parseInt(((Token) e[0]).getValue(), 10),
+                            Integer.parseInt(((Token<String>) e[0]).getValue(), 10),
                             e[0].getLocation()));
 
             List<List<Pair<Rule, Symbol>>> precendence = List.of(

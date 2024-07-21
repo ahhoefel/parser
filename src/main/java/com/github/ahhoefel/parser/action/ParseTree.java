@@ -17,6 +17,7 @@ import com.github.ahhoefel.parser.lang.Rule;
 public class ParseTree implements Locateable {
   private List<ParseTree> children;
   private Rule rule;
+  @SuppressWarnings("rawtypes")
   private Token token;
   private CodeLocation location;
 
@@ -25,6 +26,7 @@ public class ParseTree implements Locateable {
     this.children = children;
   }
 
+  @SuppressWarnings("rawtypes")
   public ParseTree(Token o) {
     this.token = o;
   }
@@ -37,6 +39,7 @@ public class ParseTree implements Locateable {
     return children;
   }
 
+  @SuppressWarnings("rawtypes")
   public Token getToken() {
     return token;
   }

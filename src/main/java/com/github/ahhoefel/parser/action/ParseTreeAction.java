@@ -22,6 +22,7 @@ public class ParseTreeAction implements Function<Locateable[], Locateable> {
         this.rule = rule;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Locateable apply(Locateable[] objects) {
         List<ParseTree> children = new ArrayList<>();

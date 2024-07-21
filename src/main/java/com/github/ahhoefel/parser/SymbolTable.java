@@ -13,16 +13,14 @@ public class SymbolTable {
   private List<Symbol> unmodifiableSymbols;
   private Map<String, Symbol> labelMap;
 
-  public static class NonTerminalTable extends SymbolTable {
+  public static class NonTerminalTable extends TerminalTable {
     private Symbol startp;
     private Symbol start;
-    private Symbol eof;
 
     public NonTerminalTable() {
       super();
       startp = newSymbol("startp");
       start = newSymbol("start");
-      eof = newSymbol("eof");
     }
 
     public Symbol getAugmentedStart() {
@@ -31,10 +29,6 @@ public class SymbolTable {
 
     public Symbol getStart() {
       return start;
-    }
-
-    public Symbol getEof() {
-      return eof;
     }
   }
 

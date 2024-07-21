@@ -2,13 +2,13 @@ package com.github.ahhoefel.parser;
 
 import com.github.ahhoefel.parser.io.CodeLocation;
 
-public class Token implements Locateable {
+public class Token<V> implements Locateable {
 
-  private final String value;
+  private final V value;
   private final Symbol symbol;
   private CodeLocation location;
 
-  public Token(Symbol symbol, String value, CodeLocation location) {
+  public Token(Symbol symbol, V value, CodeLocation location) {
     this.symbol = symbol;
     this.value = value;
     this.location = location;
@@ -26,7 +26,7 @@ public class Token implements Locateable {
     return symbol;
   }
 
-  public String getValue() {
+  public V getValue() {
     return value;
   }
 
@@ -35,10 +35,10 @@ public class Token implements Locateable {
   }
 
   public boolean equals(Object o) {
-    if (!(o instanceof Token)) {
+    if (!(o instanceof Token<?>)) {
       return false;
     }
-    Token t = (Token) o;
+    Token<?> t = (Token<?>) o;
     return value.equals(t.value) && symbol.equals(t.symbol);
   }
 }

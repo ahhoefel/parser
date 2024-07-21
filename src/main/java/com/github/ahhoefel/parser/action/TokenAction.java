@@ -29,10 +29,11 @@ public class TokenAction implements Function<Locateable[], Locateable> {
     }
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public Locateable apply(Locateable[] objects) {
     Token token = (Token) objects[0];
-    String value = token.getValue();
+    Object value = token.getValue();
     Symbol symbol = keywordMap.get(value);
     if (symbol == null) {
       symbol = terminal;

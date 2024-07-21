@@ -105,8 +105,8 @@ public class BalancedParserTest {
                     "Stack (top):",
                     "\t(Symbol: rparen, State: 12)",
                     "\t(Symbol: balanced, State: 10)",
-                    "\t(Symbol: lparen, State: 9)",
-                    "\t(Symbol: lparen, State: 5)",
+                    "\t(Symbol: lparen, State: 8)",
+                    "\t(Symbol: lparen, State: 4)",
                     "(bottom)");
             Assert.assertEquals(expected, errors.get(0).toString());
         }
