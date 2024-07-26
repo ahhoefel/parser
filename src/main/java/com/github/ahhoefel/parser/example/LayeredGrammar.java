@@ -22,20 +22,39 @@ import com.github.ahhoefel.parser.lang.SymbolProvider;
 @SuppressWarnings("rawtypes")
 public class LayeredGrammar extends LayeredParser.Layer<Iterator<Token<String>>, LocateableList> {
 
+    public static class SymbolName {
+        private String name;
+        private boolean isTerminal;
+
+        private SymbolName(String name, boolean isTerminal) {
+            this.name = name;
+            this.isTerminal = isTerminal;
+        }
+
+        public static SymbolName terminal(String name) {
+            return new SymbolName(name, true);
+        }
+
+        public static SymbolName nonTerminal(String name) {
+            return new SymbolName(name, false);
+        }
+    }
+
     public LayeredGrammar() {
         super(LocateableList.class, new TerminalLayeredParser(new CharacterMapping()), "start",
-                new OneOrMoreComponent("word", "alpha", Optional.of(ConcatAction.SINGLETON)),
-                new OneOrMoreComponent("whitespace", "space", Optional.of(ConcatAction.SINGLETON)),
-                new OrComponent("token", "period", "word", "whitespace"),
-                new OneOrMoreComponent("start", "token", Optional.of(AppendAction.SINGLETON)),
+                new OneOrMoreComponent("word", SymbolName.terminal("alpha"), Optional.of(ConcatAction.SINGLETON)),
+                new OneOrMoreComponent("whitespace", SymbolName.terminal("space"), Optional.of(ConcatAction.SINGLETON)),
+                new OrComponent("token", SymbolName.nonTerminal("period"), SymbolName.nonTerminal("word"),
+                        SymbolName.nonTerminal("whitespace")),
+                new OneOrMoreComponent("start", SymbolName.nonTerminal("token"), Optional.of(AppendAction.SINGLETON)),
                 new PeriodComponent());
     }
 
     public static class OrComponent implements LanguageComponent {
-        private String[] symbols;
+        private SymbolName[] symbols;
         private String symbol;
 
-        public OrComponent(String symbol, String... symbols) {
+        public OrComponent(String symbol, SymbolName... symbols) {
             this.symbols = symbols;
             this.symbol = symbol;
         }
@@ -43,8 +62,13 @@ public class LayeredGrammar extends LayeredParser.Layer<Iterator<Token<String>>,
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter emit) {
             Symbol symbol = provider.createAndExport(this.symbol);
-            for (String s : this.symbols) {
-                Symbol orComponent = provider.require(s);
+            for (SymbolName s : this.symbols) {
+                Symbol orComponent;
+                if (s.isTerminal) {
+                    orComponent = provider.requireTerminal(s.name);
+                } else {
+                    orComponent = provider.require(s.name);
+                }
                 Rule orRule = emit.emit(symbol, orComponent);
                 orRule.setAction(e -> e[0]);
             }
@@ -53,10 +77,10 @@ public class LayeredGrammar extends LayeredParser.Layer<Iterator<Token<String>>,
 
     public static class OneOrMoreComponent implements LanguageComponent {
         private String symbolName;
-        private String characterName;
+        private SymbolName characterName;
         private Optional<Function<Locateable[], Locateable>> action;
 
-        public OneOrMoreComponent(String symbolName, String characterName,
+        public OneOrMoreComponent(String symbolName, SymbolName characterName,
                 Optional<Function<Locateable[], Locateable>> action) {
             this.symbolName = symbolName;
             this.characterName = characterName;
@@ -66,7 +90,13 @@ public class LayeredGrammar extends LayeredParser.Layer<Iterator<Token<String>>,
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol symbol = provider.createAndExport(symbolName);
-            Symbol character = provider.require(characterName);
+
+            Symbol character;
+            if (characterName.isTerminal) {
+                character = provider.requireTerminal(characterName.name);
+            } else {
+                character = provider.require(characterName.name);
+            }
             Rule rule = rules.emit(symbol, character, symbol);
             if (action.isPresent()) {
                 rule.setAction(action.get());
@@ -83,7 +113,7 @@ public class LayeredGrammar extends LayeredParser.Layer<Iterator<Token<String>>,
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol period = provider.createAndExport("period");
-            Symbol dot = provider.require("dot");
+            Symbol dot = provider.requireTerminal("dot");
             Rule rule = rules.emit(period, dot);
             rule.setAction(ConcatAction.SINGLETON);
         }

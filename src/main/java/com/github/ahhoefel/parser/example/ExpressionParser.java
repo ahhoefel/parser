@@ -44,11 +44,11 @@ public class ExpressionParser extends LayeredParser.Layer<Iterator<Token<String>
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol expression = provider.createAndExport("expression");
             Symbol value = provider.require("value");
-            Symbol lparen = provider.require("lparen");
-            Symbol rparen = provider.require("rparen");
-            Symbol plus = provider.require("plus");
-            Symbol minus = provider.require("minus");
-            Symbol times = provider.require("times");
+            Symbol lparen = provider.requireTerminal("lparen");
+            Symbol rparen = provider.requireTerminal("rparen");
+            Symbol plus = provider.requireTerminal("plus");
+            Symbol minus = provider.requireTerminal("minus");
+            Symbol times = provider.requireTerminal("times");
             Rule plusRule = rules.emit(expression, expression, plus, expression);
             Rule minusRule = rules.emit(expression, expression, minus, expression);
             Rule timesRule = rules.emit(expression, expression, times, expression);
@@ -87,8 +87,8 @@ public class ExpressionParser extends LayeredParser.Layer<Iterator<Token<String>
             Symbol identifierTail = provider.create("identifierTail");
             Symbol alphanumeric = provider.create("alphanumeric");
             Symbol number = provider.create("number");
-            Symbol alpha = provider.require("alpha");
-            Symbol numeral = provider.require("numeral");
+            Symbol alpha = provider.requireTerminal("alpha");
+            Symbol numeral = provider.requireTerminal("numeral");
 
             rules.emit(value, identifier);
             rules.emit(value, number);

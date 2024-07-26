@@ -55,7 +55,14 @@ public class GrammarBuilder {
                 if (optSymbol.isPresent()) {
                     return optSymbol.get();
                 }
-                optSymbol = terminals.getSymbolByLabel(label);
+                Symbol symbol = nonTerminals.newSymbol(label);
+                notProvided.put(label, symbol);
+                return symbol;
+            }
+
+            @Override
+            public Symbol requireTerminal(String label) {
+                Optional<Symbol> optSymbol = terminals.getSymbolByLabel(label);
                 if (optSymbol.isPresent()) {
                     return optSymbol.get();
                 }

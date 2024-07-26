@@ -6,6 +6,8 @@ import com.github.ahhoefel.parser.Symbol;
 public interface SymbolProvider {
     Symbol require(String symbol);
 
+    Symbol requireTerminal(String symbol);
+
     Symbol createAndExport(String symbol);
 
     Symbol create(String symbol);

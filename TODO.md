@@ -1,3 +1,17 @@
+2024-07-21
+ - LayeredParser is done.
+ - Next, I'd like actions to apply to arbitrary objects rather than Locatables. It would be nice for actions to respect whatever type is underneath, and not need to know if they are locatable. This also means tests can work on strings and lists rather than tokens and LocatableLists.
+ - Separately, parser2 should be migrated to this dependency.
+ - Language idea for interfaces:
+   - Instead of vtables, use "interfaces" which are structs of bound methods.
+   - Have automatic coersion from objects to interfaces which extract the require methods and binds them.
+   - This covers the polymorphic case where you want a collection of interfaces and call the same method on different types of objects.
+   - For the case where you want to pass different types of objects to a function, that can be covered by the compiler in a variety of ways:
+      - multiple instances of the function for the different types passed, determined by static analysis.
+      - a labelled union could be passed by the compiler and different types would be treated by implicit case statements
+      - interfaces could be passed
+    - Can we make labelled unions easier to use by lifting common methods? 
+
 2024-07-18
  - Following on the notes below, I changed the Tokenizer to be generic and RangeTokenizer to implement Tokenizer<Token<String>>.
  - The LayeredParser needs a recursive generic structure to be able to provide different outputs at different Layers.

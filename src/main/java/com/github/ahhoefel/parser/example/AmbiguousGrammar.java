@@ -45,7 +45,7 @@ public class AmbiguousGrammar extends LayeredParser.Layer<Iterator<Token<String>
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol symbolS = provider.createAndExport("S");
             Symbol symbolA = provider.create("A");
-            Symbol letterA = provider.require("letterA");
+            Symbol letterA = provider.requireTerminal("letterA");
             rules.emit(symbolS, symbolA);
             rules.emit(symbolS, letterA);
             rules.emit(symbolA, letterA);
@@ -56,7 +56,7 @@ public class AmbiguousGrammar extends LayeredParser.Layer<Iterator<Token<String>
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol symbolS = provider.createAndExport("S");
-            Symbol letterA = provider.require("letterA");
+            Symbol letterA = provider.requireTerminal("letterA");
             rules.emit(symbolS, letterA, symbolS, letterA);
             rules.emit(symbolS);
         }
@@ -66,8 +66,8 @@ public class AmbiguousGrammar extends LayeredParser.Layer<Iterator<Token<String>
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol symbolS = provider.createAndExport("S");
-            Symbol plus = provider.require("plus");
-            Symbol letterA = provider.require("letterA");
+            Symbol plus = provider.requireTerminal("plus");
+            Symbol letterA = provider.requireTerminal("letterA");
             rules.emit(symbolS, symbolS, plus, symbolS);
             rules.emit(symbolS, letterA);
         }

@@ -34,8 +34,8 @@ public class BalancedParser extends LayeredParser.Layer<Iterator<Token<String>>,
             Symbol balanced = provider.createAndExport("balanced");
             Rule concat = rules.emit(balanced, balanced, balanced);
 
-            Symbol alphanumeric = provider.require("alphanumeric");
-            Symbol lparen = provider.require("lparen");
+            Symbol alphanumeric = provider.requireTerminal("alphanumeric");
+            Symbol lparen = provider.requireTerminal("lparen");
             resolver.addShiftPreference(concat, alphanumeric);
             resolver.addShiftPreference(concat, lparen);
         }
@@ -46,8 +46,8 @@ public class BalancedParser extends LayeredParser.Layer<Iterator<Token<String>>,
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol balanced = provider.require("balanced");
             Symbol identifier = provider.require("identifier");
-            Symbol lparen = provider.require("lparen");
-            Symbol rparen = provider.require("rparen");
+            Symbol lparen = provider.requireTerminal("lparen");
+            Symbol rparen = provider.requireTerminal("rparen");
             rules.emit(balanced, lparen, balanced, rparen);
             rules.emit(balanced, identifier);
         }
@@ -57,7 +57,7 @@ public class BalancedParser extends LayeredParser.Layer<Iterator<Token<String>>,
         @Override
         public void provideRules(SymbolProvider provider, ShiftReduceResolver resolver, RuleEmitter rules) {
             Symbol identifier = provider.createAndExport("identifier");
-            Symbol alphanumeric = provider.require("alphanumeric");
+            Symbol alphanumeric = provider.requireTerminal("alphanumeric");
             Rule identifierRule = rules.emit(identifier, alphanumeric, identifier);
             identifierRule.setAction(ConcatAction.SINGLETON);
             Rule alpha = rules.emit(identifier, alphanumeric);
