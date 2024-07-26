@@ -32,7 +32,9 @@ public class AppendAction implements Function<Locateable[], Locateable> {
   @SuppressWarnings("unchecked")
   public Locateable apply(Locateable[] objects) {
     LocateableList<Locateable> list;
-    if (objects[0] instanceof LocateableList) {
+    if (objects.length == 0) {
+      list = new LocateableList<>();
+    } else if (objects[0] instanceof LocateableList) {
       list = (LocateableList<Locateable>) objects[0];
     } else {
       list = new LocateableList<>();
