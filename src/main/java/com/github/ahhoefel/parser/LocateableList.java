@@ -1,12 +1,13 @@
 package com.github.ahhoefel.parser;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.ahhoefel.parser.io.CodeLocation;
 
-public class LocateableList<T> implements Locateable {
+public class LocateableList<T> implements Locateable, Iterator<T> {
 
     private CodeLocation location;
     private List<T> list;
@@ -44,5 +45,17 @@ public class LocateableList<T> implements Locateable {
     public String toString() {
         return list.stream().map(Object::toString)
                 .collect(Collectors.joining(", "));
+    }
+
+    private int iterIndex = 0;
+
+    @Override
+    public boolean hasNext() {
+        return iterIndex < list.size();
+    }
+
+    @Override
+    public T next() {
+        return list.get(iterIndex++);
     }
 }
