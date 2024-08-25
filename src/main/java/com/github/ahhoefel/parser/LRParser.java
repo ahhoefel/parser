@@ -74,7 +74,11 @@ public class LRParser {
       System.out.println(table);
       throw new ParseException(log);
     }
-    return clazz.cast(o);
+    try {
+      return clazz.cast(o);
+    } catch (ClassCastException e) {
+      throw new RuntimeException("Class cast exception of object " + o.toString(), e);
+    }
   }
 
   private static LRTable getCanonicalLRTable(Grammar g) {
