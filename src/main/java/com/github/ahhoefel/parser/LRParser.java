@@ -172,10 +172,10 @@ public class LRParser {
     Stack<SymbolState> stack = new Stack<>();
     Stack<Locateable> result = new Stack<>();
     SymbolState symbolState = new SymbolState(start, 0);
+
     Token nextToken;
     Symbol nextSymbol;
     boolean lastIteration = false;
-
     if (tokens.hasNext()) {
       nextToken = tokens.next();
       nextSymbol = nextToken.getSymbol();
