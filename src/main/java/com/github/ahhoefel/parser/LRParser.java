@@ -77,6 +77,7 @@ public class LRParser {
     try {
       return clazz.cast(o);
     } catch (ClassCastException e) {
+      System.out.println(table.toString());
       throw new RuntimeException("Class cast exception of object " + o.toString(), e);
     }
   }
@@ -170,9 +171,20 @@ public class LRParser {
       ErrorLog log) {
     Stack<SymbolState> stack = new Stack<>();
     Stack<Locateable> result = new Stack<>();
-    Token nextToken = tokens.next();
-    Symbol nextSymbol = nextToken.getSymbol();
     SymbolState symbolState = new SymbolState(start, 0);
+    Token nextToken;
+    Symbol nextSymbol;
+    boolean lastIteration = false;
+
+    if (tokens.hasNext()) {
+      nextToken = tokens.next();
+      nextSymbol = nextToken.getSymbol();
+    } else {
+      lastIteration = true;
+      nextToken = new Token<String>(table.eof, "eof", null);
+      nextSymbol = table.eof;
+    }
+
     while (true) {
       LRTable.State state = table.state.get(symbolState.stateIndex);
       if (state.shift.containsKey(nextSymbol)) {
@@ -181,9 +193,13 @@ public class LRParser {
         if (tokens.hasNext()) {
           nextToken = tokens.next();
           nextSymbol = nextToken.getSymbol();
-        } else {
+        } else if (lastIteration) {
           result.pop(); // Remove eof
           break;
+        } else {
+          lastIteration = true;
+          nextToken = new Token<String>(table.eof, "eof", null);
+          nextSymbol = table.eof;
         }
       } else if (state.reduce.containsKey(nextSymbol)) {
         Rule rule = state.reduce.get(nextSymbol);

@@ -18,7 +18,8 @@ import com.github.ahhoefel.parser.lang.SymbolProvider;
 public class BalancedParser extends LayeredParser.Layer<Iterator<Token<String>>, ParseTree> {
 
     public BalancedParser() {
-        super(ParseTree.class, new TerminalLayeredParser(new AlphanumericAndParenMapping()), "balanced",
+        super("BalancedParser", ParseTree.class, new TerminalLayeredParser(new AlphanumericAndParenMapping()),
+                "balanced",
                 new StartComponent(), new BracketComponent(), new IdentifierComponent());
     }
 

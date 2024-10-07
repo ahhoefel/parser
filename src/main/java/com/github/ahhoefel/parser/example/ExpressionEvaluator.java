@@ -18,7 +18,8 @@ import com.github.ahhoefel.parser.lang.SymbolProvider;
 public class ExpressionEvaluator extends LayeredParser.Layer<Iterator<Token<String>>, LocateableInteger> {
 
     public ExpressionEvaluator() {
-        super(LocateableInteger.class, new TerminalLayeredParser(new CharacterMapping()), "expression",
+        super("ExpressionEvaluator", LocateableInteger.class, new TerminalLayeredParser(new CharacterMapping()),
+                "expression",
                 new OperatorComponent(), new ValueComponent());
     }
 

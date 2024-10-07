@@ -41,7 +41,7 @@ public class LayeredGrammar extends LayeredParser.Layer<Iterator<Token<String>>,
     }
 
     public LayeredGrammar() {
-        super(LocateableList.class, new TerminalLayeredParser(new CharacterMapping()), "start",
+        super("LayeredGrammar", LocateableList.class, new TerminalLayeredParser(new CharacterMapping()), "start",
                 new OneOrMoreComponent("word", SymbolName.terminal("alpha"), Optional.of(ConcatAction.SINGLETON)),
                 new OneOrMoreComponent("whitespace", SymbolName.terminal("space"), Optional.of(ConcatAction.SINGLETON)),
                 new OrComponent("token", SymbolName.nonTerminal("period"), SymbolName.nonTerminal("word"),

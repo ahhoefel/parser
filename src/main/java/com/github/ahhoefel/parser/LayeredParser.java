@@ -51,14 +51,18 @@ public interface LayeredParser<T> {
         private Class<T> clazz;
         private LayeredParser<S> parent;
         private LRParser parser;
+        private String label;
 
-        public Layer(Class<T> clazz, LayeredParser<S> parent, LRParser parser) {
+        public Layer(String label, Class<T> clazz, LayeredParser<S> parent, LRParser parser) {
             this.clazz = clazz;
             this.parent = parent;
             this.parser = parser;
+            this.label = label;
         }
 
-        public Layer(Class<T> clazz, LayeredParser<S> parent, String startSymbol, LanguageComponent... components) {
+        public Layer(String label, Class<T> clazz, LayeredParser<S> parent, String startSymbol,
+                LanguageComponent... components) {
+            this.label = label;
             this.clazz = clazz;
             this.parent = parent;
             parser = new LRParser(parent.getSymbols(), startSymbol, components);
@@ -71,9 +75,14 @@ public interface LayeredParser<T> {
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         public T parse(Optional<Target> target, String s) {
-            S result = parent.parse(target, s);
-            System.out.println(result);
-            return parser.parse((Iterator<Token>) result, clazz);
+            Iterator<Token> parentResult = (Iterator<Token>) parent.parse(target, s);
+            T result;
+            try {
+                result = parser.parse(parentResult, clazz);
+            } catch (Exception e) {
+                throw new RuntimeException("Exception in ParserLayer \"" + label + "\"", e);
+            }
+            return result;
         }
     }
 

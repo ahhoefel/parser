@@ -18,7 +18,7 @@ import com.github.ahhoefel.parser.lang.SymbolProvider;
 public class ExpressionParser extends LayeredParser.Layer<Iterator<Token<String>>, ParseTree> {
 
     public ExpressionParser() {
-        super(ParseTree.class, new TerminalLayeredParser(new CharacterMapping()), "expression",
+        super("ExpressionParser", ParseTree.class, new TerminalLayeredParser(new CharacterMapping()), "expression",
                 new OperatorComponent(), new ValueComponent());
     }
 

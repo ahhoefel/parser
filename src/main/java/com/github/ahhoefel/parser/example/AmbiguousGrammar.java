@@ -16,7 +16,7 @@ import com.github.ahhoefel.parser.lang.SymbolProvider;
 public class AmbiguousGrammar extends LayeredParser.Layer<Iterator<Token<String>>, String> {
 
     public AmbiguousGrammar(LanguageComponent component) {
-        super(String.class, new TerminalLayeredParser(new LetterAMapping()), "S",
+        super("AmbiguousGrammar", String.class, new TerminalLayeredParser(new LetterAMapping()), "S",
                 component);
     }
 
@@ -34,7 +34,7 @@ public class AmbiguousGrammar extends LayeredParser.Layer<Iterator<Token<String>
             System.out.println(e);
         }
 
-        LayeredParser<String> parser = new Layer<Iterator<Token<String>>, String>(String.class,
+        LayeredParser<String> parser = new Layer<Iterator<Token<String>>, String>("TopLayer", String.class,
                 new TerminalLayeredParser(new LetterAAndPlusMapping()), "S",
                 new ShiftReduceFixableComponent());
         System.out.println(parser.parse(Optional.empty(), "a+a+a"));

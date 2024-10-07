@@ -19,10 +19,15 @@ public interface Tokenizer<T> {
     public static <T> List<T> tokenize(Tokenizer<T> tokenizer, Optional<Target> target, String input,
             ErrorLog log) {
         List<T> list = new ArrayList<>();
+        int lineNumber = 0;
+        int charNumber = 0;
         for (int i = 0; i < input.length(); i++) {
-            list.add(tokenizer.of(input.charAt(i), new CodeLocation(target, 0, i, i)));
+            list.add(tokenizer.of(input.charAt(i), new CodeLocation(target, lineNumber, charNumber++, i)));
+            if (input.charAt(i) == '\n') {
+                lineNumber++;
+                charNumber = 0;
+            }
         }
-        list.add(tokenizer.eof());
         return list;
     }
 }
