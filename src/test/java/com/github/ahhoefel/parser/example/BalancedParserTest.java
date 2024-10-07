@@ -21,9 +21,9 @@ public class BalancedParserTest {
         boolean exceptionThrown = false;
         try {
             parser.parse("");
-        } catch (ParseException e) {
+        } catch (Exception e) {
             exceptionThrown = true;
-            List<ParseError> errors = e.getErrorLog().getErrors();
+            List<ParseError> errors = ((ParseException) e.getCause()).getErrorLog().getErrors();
             Assert.assertEquals(1, errors.size());
             String expected = String.join("\n",
                     "no location ",
@@ -93,9 +93,9 @@ public class BalancedParserTest {
         boolean exceptionThrown = false;
         try {
             parser.parse("((a)");
-        } catch (ParseException e) {
+        } catch (Exception e) {
             exceptionThrown = true;
-            List<ParseError> errors = e.getErrorLog().getErrors();
+            List<ParseError> errors = ((ParseException) e.getCause()).getErrorLog().getErrors();
             Assert.assertEquals(1, errors.size());
             String expected = String.join("\n",
                     "no location ",
